@@ -200,6 +200,7 @@ export default function Dashboard() {
           subtitle="°C"
           icon={Thermometer}
           gradient="warning"
+withBackground
         />
         <MetricCard
           title="Umidade Média"
@@ -207,6 +208,7 @@ export default function Dashboard() {
           subtitle="%"
           icon={Droplets}
           gradient="primary"
+withBackground
         />
         <MetricCard
           title="Velocidade Média do Vento"
@@ -214,12 +216,14 @@ export default function Dashboard() {
           subtitle="km/h"
           icon={Wind}
           gradient="accent"
+withBackground
         />
         <MetricCard
           title="Total de Registros"
           value={formatMetricValue(displayMetrics?.totalRecords, true)}
           icon={Database}
           gradient="primary"
+withBackground
         />
       </div>
 
