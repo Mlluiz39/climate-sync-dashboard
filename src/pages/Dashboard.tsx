@@ -19,7 +19,6 @@ import {
 } from 'recharts'
 import React from 'react'
 
-// Tipos para as métricas
 interface DashboardMetrics {
   avgTemperature?: number
   avgHumidity?: number
@@ -36,7 +35,6 @@ interface AnalyticsData {
   temperatureRanges: TemperatureRange[]
 }
 
-// Formata métricas de forma segura
 const formatMetricValue = (
   value: number | undefined,
   isCount: boolean = false
@@ -50,7 +48,6 @@ export default function Dashboard() {
   const [weatherHistory, setWeatherHistory] = useState<WeatherData[]>([])
   const { latestData, isConnected } = useRealtimeWeather()
 
-  // Queries do React Query com tipagem adequada
   const {
     data: metrics,
     isLoading: metricsLoading,
@@ -75,21 +72,18 @@ export default function Dashboard() {
     queryFn: async () => (await weatherApi.getAll()) ?? [],
   })
 
-  // Atualiza histórico inicial
   useEffect(() => {
     if (initialWeather?.length) {
       setWeatherHistory(initialWeather.slice(-20))
     }
   }, [initialWeather])
 
-  // Atualiza histórico com dados em tempo real
   useEffect(() => {
     if (latestData) {
       setWeatherHistory(prev => [...prev.slice(-19), latestData])
     }
   }, [latestData])
 
-  // Calcula métricas a partir do histórico (em tempo real)
   const calculatedMetrics = useMemo((): DashboardMetrics => {
     if (!weatherHistory || weatherHistory.length === 0) {
       return {
@@ -119,12 +113,25 @@ export default function Dashboard() {
     }
   }, [weatherHistory])
 
-  const displayMetrics: DashboardMetrics =
-    calculatedMetrics.totalRecords && calculatedMetrics.totalRecords > 0
-      ? calculatedMetrics
-      : metrics ?? {}
+  const displayMetrics: DashboardMetrics = {
+    avgTemperature:
+      calculatedMetrics.avgTemperature ??
+      metrics?.avgTemperature ??
+      0,
+    avgHumidity:
+      calculatedMetrics.avgHumidity ??
+      metrics?.avgHumidity ??
+      0,
+    avgWindSpeed:
+      calculatedMetrics.avgWindSpeed ??
+      metrics?.avgWindSpeed ??
+      0,
+    totalRecords:
+      calculatedMetrics.totalRecords ??
+      metrics?.totalRecords ??
+      0,
+  }
 
-  // Tipos para os dados dos gráficos
   interface TemperatureChartData {
     time: string
     temperature: number
@@ -136,40 +143,28 @@ export default function Dashboard() {
     humidity: number
   }
 
-  const temperatureData: TemperatureChartData[] = weatherHistory.map(item => ({
-    time: new Date(item.timestamp).toLocaleTimeString(),
-    temperature: item.temperature || 0,
-    city: item.city || 'Unknown',
-  }))
+  // Se não houver histórico, exibe array vazio com 1 item padrão para gráficos
+  const temperatureData: TemperatureChartData[] =
+    weatherHistory.length > 0
+      ? weatherHistory.map(item => ({
+          time: new Date(item.timestamp).toLocaleTimeString(),
+          temperature: item.temperature || 0,
+          city: item.city || 'Unknown',
+        }))
+      : [{ time: '00:00', temperature: 0, city: 'Unknown' }]
 
-  const humidityData: HumidityChartData[] = weatherHistory.map(item => ({
-    time: new Date(item.timestamp).toLocaleTimeString(),
-    humidity: item.humidity || 0,
-  }))
+  const humidityData: HumidityChartData[] =
+    weatherHistory.length > 0
+      ? weatherHistory.map(item => ({
+          time: new Date(item.timestamp).toLocaleTimeString(),
+          humidity: item.humidity || 0,
+        }))
+      : [{ time: '00:00', humidity: 0 }]
 
-  // Remove a função duplicada formatMetricValue
-  // A função original já está definida no início do arquivo
-
-  if (metricsLoading) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    )
-  }
-
-  if (metricsError) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <div className="text-center">
-          <h2 className="text-lg font-semibold text-destructive">
-            Erro ao carregar métricas
-          </h2>
-          <p className="text-muted-foreground">Tente recarregar a página.</p>
-        </div>
-      </div>
-    )
-  }
+  const temperatureRanges =
+    analytics?.temperatureRanges?.length > 0
+      ? analytics.temperatureRanges
+      : [{ range: '0-0', count: 0 }]
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -191,6 +186,12 @@ export default function Dashboard() {
           </span>
         </div>
       </div>
+
+      {metricsError && (
+        <p className="text-destructive text-sm mb-2">
+          Não foi possível carregar métricas do servidor. Mostrando valores padrão.
+        </p>
+      )}
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <MetricCard
@@ -229,15 +230,8 @@ export default function Dashboard() {
           </h3>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={temperatureData}>
-              <CartesianGrid
-                strokeDasharray="3 3"
-                stroke="hsl(var(--border))"
-              />
-              <XAxis
-                dataKey="time"
-                stroke="hsl(var(--muted-foreground))"
-                fontSize={12}
-              />
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+              <XAxis dataKey="time" stroke="hsl(var(--muted-foreground))" fontSize={12} />
               <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
               <Tooltip
                 contentStyle={{
@@ -265,15 +259,8 @@ export default function Dashboard() {
           </h3>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={humidityData}>
-              <CartesianGrid
-                strokeDasharray="3 3"
-                stroke="hsl(var(--border))"
-              />
-              <XAxis
-                dataKey="time"
-                stroke="hsl(var(--muted-foreground))"
-                fontSize={12}
-              />
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+              <XAxis dataKey="time" stroke="hsl(var(--muted-foreground))" fontSize={12} />
               <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
               <Tooltip
                 contentStyle={{
@@ -296,42 +283,33 @@ export default function Dashboard() {
         </Card>
       </div>
 
-      {analytics?.temperatureRanges &&
-        analytics.temperatureRanges.length > 0 && (
-          <Card className="p-6 shadow-card">
-            <h3 className="text-lg font-semibold mb-4">
-              Distribuição de Temperatura
-            </h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={analytics.temperatureRanges}>
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  stroke="hsl(var(--border))"
-                />
-                <XAxis
-                  dataKey="range"
-                  stroke="hsl(var(--muted-foreground))"
-                  fontSize={12}
-                />
-                <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'hsl(var(--card))',
-                    border: '1px solid hsl(var(--border))',
-                    borderRadius: '8px',
-                  }}
-                />
-                <Legend />
-                <Bar
-                  dataKey="count"
-                  fill="hsl(var(--accent))"
-                  radius={[8, 8, 0, 0]}
-                  name="Registros"
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </Card>
-        )}
+      <Card className="p-6 shadow-card">
+        <h3 className="text-lg font-semibold mb-4">
+          Distribuição de Temperatura
+        </h3>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={temperatureRanges}>
+            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+            <XAxis dataKey="range" stroke="hsl(var(--muted-foreground))" fontSize={12} />
+            <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: 'hsl(var(--card))',
+                border: '1px solid hsl(var(--border))',
+                borderRadius: '8px',
+              }}
+            />
+            <Legend />
+            <Bar
+              dataKey="count"
+              fill="hsl(var(--accent))"
+              radius={[8, 8, 0, 0]}
+              name="Registros"
+            />
+          </BarChart>
+        </ResponsiveContainer>
+      </Card>
     </div>
   )
 }
+
