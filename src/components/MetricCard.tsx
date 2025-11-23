@@ -1,31 +1,43 @@
-import { Card } from "@/components/ui/card";
-import { LucideIcon } from "lucide-react";
+import { Card } from "@/components/ui/card"
 
 interface MetricCardProps {
-  title: string;
-  value: string | number;
-  icon: LucideIcon;
-  gradient?: "primary" | "accent" | "warning";
-  subtitle?: string;
+  title: string
+  value: string | number
+  subtitle?: string
+  icon: React.ReactNode
+  gradient?: "primary" | "warning" | "accent"
+  withBackground?: boolean
 }
 
-export function MetricCard({ title, value, icon: Icon, gradient = "primary", subtitle }: MetricCardProps) {
-  const gradientClass = `bg-gradient-${gradient}`;
-  
+export function MetricCard({
+  title,
+  value,
+  subtitle,
+  icon,
+  gradient = "primary",
+  withBackground = true,
+}: MetricCardProps) {
   return (
-    <Card className="p-6 shadow-card hover:shadow-card-hover transition-all duration-300 border-border/50">
-      <div className="flex items-start justify-between">
-        <div className="space-y-2 flex-1">
-          <p className="text-sm font-medium text-muted-foreground">{title}</p>
-          <div className="flex items-baseline gap-2">
-            <h3 className="text-3xl font-bold tracking-tight">{value}</h3>
-            {subtitle && <span className="text-sm text-muted-foreground">{subtitle}</span>}
-          </div>
-        </div>
-        <div className={`p-3 rounded-lg ${gradientClass}`}>
-          <Icon className="h-6 w-6 text-white" />
+    <Card className="p-4 flex items-center gap-4 shadow-sm">
+      {/* Ícone com fundo azul */}
+      <div
+        className={`p-3 rounded-xl bg-blue-100 flex items-center justify-center`}
+      >
+        <div className="text-blue-600">{icon}</div>
+      </div>
+
+      {/* Conteúdo */}
+      <div>
+        <p className="text-sm text-muted-foreground">{title}</p>
+        <div className="flex items-end gap-1">
+          <h3 className="text-2xl font-bold">{value}</h3>
+          {subtitle && (
+            <span className="text-xs text-muted-foreground mb-[2px]">
+              {subtitle}
+            </span>
+          )}
         </div>
       </div>
     </Card>
-  );
+  )
 }
