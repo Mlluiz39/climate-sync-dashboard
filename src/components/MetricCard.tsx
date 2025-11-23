@@ -1,0 +1,31 @@
+import { Card } from "@/components/ui/card";
+import { LucideIcon } from "lucide-react";
+
+interface MetricCardProps {
+  title: string;
+  value: string | number;
+  icon: LucideIcon;
+  gradient?: "primary" | "accent" | "warning";
+  subtitle?: string;
+}
+
+export function MetricCard({ title, value, icon: Icon, gradient = "primary", subtitle }: MetricCardProps) {
+  const gradientClass = `bg-gradient-${gradient}`;
+  
+  return (
+    <Card className="p-6 shadow-card hover:shadow-card-hover transition-all duration-300 border-border/50">
+      <div className="flex items-start justify-between">
+        <div className="space-y-2 flex-1">
+          <p className="text-sm font-medium text-muted-foreground">{title}</p>
+          <div className="flex items-baseline gap-2">
+            <h3 className="text-3xl font-bold tracking-tight">{value}</h3>
+            {subtitle && <span className="text-sm text-muted-foreground">{subtitle}</span>}
+          </div>
+        </div>
+        <div className={`p-3 rounded-lg ${gradientClass}`}>
+          <Icon className="h-6 w-6 text-white" />
+        </div>
+      </div>
+    </Card>
+  );
+}
