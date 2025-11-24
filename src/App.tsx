@@ -5,6 +5,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { AppSidebar } from '@/components/AppSidebar'
+import Login from './pages/Login'
+import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
 import WeatherTable from './pages/WeatherTable'
 import RealtimePage from './pages/RealtimePage'
@@ -35,6 +37,14 @@ const router = createBrowserRouter(
   [
     {
       path: '/',
+      element: <Login />,
+    },
+    {
+      path: '/register',
+      element: <Register />,
+    },
+    {
+      path: '/dashboard',
       element: (
         <Layout>
           <Dashboard />

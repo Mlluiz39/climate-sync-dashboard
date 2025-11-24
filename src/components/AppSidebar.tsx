@@ -1,8 +1,10 @@
-import { LayoutDashboard, Cloud, Activity } from "lucide-react";
+import { LayoutDashboard, Cloud, Activity, LogOut } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
+import { useNavigate } from "react-router-dom";
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -11,9 +13,10 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { Button } from "./ui/button";
 
 const items = [
-  { title: "Painel", url: "/", icon: LayoutDashboard },
+  { title: "Painel", url: "/dashboard", icon: LayoutDashboard },
   { title: "Dados Climáticos", url: "/weather", icon: Cloud },
   { title: "Tempo Real", url: "/realtime", icon: Activity },
 ];
@@ -21,6 +24,11 @@ const items = [
 export function AppSidebar() {
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    navigate("/");
+  };
 
   return (
     <Sidebar className={isCollapsed ? "w-14" : "w-60"} collapsible="icon">
@@ -54,6 +62,29 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+
+      <SidebarFooter className="p-4 border-t border-sidebar-border">
+        {isCollapsed ? (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleLogout}
+            className="w-full justify-center text-muted-foreground hover:text-destructive"
+            title="Sair"
+          >
+            <LogOut className="h-5 w-5" />
+          </Button>
+        ) : (
+          <Button
+            variant="outline"
+            onClick={handleLogout}
+            className="w-full justify-start gap-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 hover:border-destructive/50"
+          >
+            <LogOut className="h-4 w-4" />
+            <span>Sair</span>
+          </Button>
+        )}
+      </SidebarFooter>
     </Sidebar>
   );
 }
