@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { CloudSun } from "lucide-react";
+import { authApi } from "@/services/api";
 
 const Register = () => {
   const [name, setName] = useState("");
@@ -26,20 +27,14 @@ const Register = () => {
         return;
     }
 
-    // Simulação de registro
     try {
-      // Delay artificial para simular requisição
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      if (name && email && password) {
-         toast.success("Conta criada com sucesso! Faça login.");
-         navigate("/");
-      } else {
-         toast.error("Por favor, preencha todos os campos.");
-      }
-    } catch (error) {
+      await authApi.register({ name, email, password });
+      toast.success("Conta criada com sucesso! Faça login.");
+      navigate("/");
+    } catch (error: any) {
       console.error(error);
-      toast.error("Erro ao criar conta");
+      const errorMessage = error.response?.data?.message || "Erro ao criar conta. Tente novamente.";
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }

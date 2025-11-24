@@ -7,6 +7,35 @@ export const api = axios.create({
   },
 })
 
+// Interceptor para adicionar o token em todas as requisições
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+export interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+export interface RegisterData {
+  name: string;
+  email: string;
+  password: string;
+}
+
+export interface AuthResponse {
+  access_token: string;
+  user?: {
+    id: string;
+    email: string;
+    name: string;
+  };
+}
+
 export interface WeatherData {
   windSpeed: number
   id: string 
@@ -31,7 +60,14 @@ export interface AnalyticsData {
   }[]
 }
 
-// API Methods - Ajustando para a estrutura de resposta do backend
+// API Methods
+export const authApi = {
+  login: (credentials: LoginCredentials) => 
+    api.post<AuthResponse>('/auth/login', credentials).then(res => res.data),
+  register: (data: RegisterData) => 
+    api.post<AuthResponse>('/auth/register', data).then(res => res.data),
+}
+
 export const weatherApi = {
   getAll: () => api.get<WeatherData[]>('/weather').then(res => res.data),
   getDashboard: () =>

@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { CloudSun } from "lucide-react";
+import { authApi } from "@/services/api";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -17,20 +18,22 @@ const Login = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulação de login
     try {
-      // Delay artificial para simular requisição
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const response = await authApi.login({ email, password });
       
-      if (email && password) {
+      if (response.access_token) {
+         localStorage.setItem('token', response.access_token);
+         if (response.user) {
+             localStorage.setItem('user', JSON.stringify(response.user));
+         }
+         
          toast.success("Login realizado com sucesso!");
          navigate("/dashboard");
-      } else {
-         toast.error("Por favor, preencha todos os campos.");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      toast.error("Erro ao realizar login");
+      const errorMessage = error.response?.data?.message || "Erro ao realizar login. Verifique suas credenciais.";
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
