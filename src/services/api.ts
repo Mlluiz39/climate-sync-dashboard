@@ -60,6 +60,40 @@ export interface AnalyticsData {
   }[]
 }
 
+export interface AIInsight {
+  id?: string
+  type: string
+  title: string
+  description: string
+  recommendation?: string
+  confidence?: number
+  timestamp?: string
+  severity?: 'info' | 'warning' | 'critical'
+}
+
+// Estrutura real retornada pelo backend
+export interface BackendInsightsResponse {
+  data: {
+    summary: string
+    details: AIInsight[]
+    generated_at: string
+    context: {
+      dataPointsAnalyzed: number
+    }
+  }
+}
+
+// Estrutura normalizada para uso no frontend
+export interface NormalizedInsightsResponse {
+  insights: AIInsight[]
+  generatedAt: string
+  summary: string
+  context?: {
+    dataPointsAnalyzed: number
+  }
+}
+
+
 // API Methods
 export const authApi = {
   login: (credentials: LoginCredentials) =>
@@ -74,6 +108,8 @@ export const weatherApi = {
     api.get<{ data: DashboardMetrics }>('/dashboard').then(res => res.data),
   getAnalytics: () =>
     api.get<{ data: AnalyticsData }>('/analytics').then(res => res.data),
+  getInsights: () =>
+    api.get<BackendInsightsResponse>('/weather/insights').then(res => res.data),
 }
 
 export const REALTIME_WEATHER_URL = `${api.defaults.baseURL}/weather/realtime`

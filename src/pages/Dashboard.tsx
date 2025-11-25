@@ -4,7 +4,7 @@ import { Thermometer, Droplets, Wind, Database, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { MetricCard } from '@/components/MetricCard'
 import { Card } from '@/components/ui/card'
-import { weatherApi, WeatherData } from '@/services/api'
+import { weatherApi, WeatherData, BackendInsightsResponse, NormalizedInsightsResponse } from '@/services/api'
 import { useRealtimeWeather } from '@/hooks/useRealtimeWeather'
 import {
   LineChart,
@@ -67,6 +67,41 @@ export default function Dashboard() {
     queryFn: async () =>
       (await weatherApi.getAnalytics())?.data ?? { temperatureRanges: [] },
   })
+
+
+  const {
+    data: aiInsights,
+    isLoading: insightsLoading,
+    error: insightsError,
+    refetch: refetchInsights,
+  } = useQuery<BackendInsightsResponse>({
+    queryKey: ['aiInsights'],
+    queryFn: async () => await weatherApi.getInsights(),
+    staleTime: 5 * 60 * 1000, // 5 minutos
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    enabled: false, // Não buscar automaticamente, apenas quando o usuário clicar
+  })
+
+  // Normalizar dados do backend para formato usado no frontend
+  const normalizedInsights = useMemo((): NormalizedInsightsResponse | null => {
+    if (!aiInsights) return null
+    
+    console.log('🔍 Raw aiInsights from backend:', aiInsights)
+    
+    // Mapear estrutura do backend para estrutura do frontend
+    const normalized: NormalizedInsightsResponse = {
+      insights: aiInsights.data.details, // Backend usa 'details' ao invés de 'insights'
+      generatedAt: aiInsights.data.generated_at,
+      summary: aiInsights.data.summary,
+      context: aiInsights.data.context
+    }
+    
+    console.log('✅ Normalized insights:', normalized)
+    console.log('📊 Number of insights:', normalized.insights.length)
+    
+    return normalized
+  }, [aiInsights])
 
   const { data: initialWeather } = useQuery<WeatherData[]>({
     queryKey: ['weatherHistory'],
@@ -336,44 +371,135 @@ export default function Dashboard() {
         </ResponsiveContainer>
       </Card>
 
-      <Card className="p-6 shadow-card bg-gradient-to-br from-card to-accent/5 border-accent/20">
-        <div className="flex items-start justify-between">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <Sparkles className="h-5 w-5 text-accent" />
-              <h3 className="text-lg font-semibold">Insights de IA</h3>
-            </div>
-            <p className="text-muted-foreground mb-4">
-              Análise preditiva e recomendações baseadas nos dados climáticos.
-              Em breve você poderá gerar relatórios detalhados com inteligência artificial.
-            </p>
-            <div className="flex gap-2">
-              <Button disabled className="bg-accent/10 text-accent hover:bg-accent/20 border-accent/20">
-                Gerar Análise
-              </Button>
-            </div>
-          </div>
-        </div>
-      </Card>
 
       <Card className="p-6 shadow-card bg-gradient-to-br from-card to-accent/5 border-accent/20">
-        <div className="flex items-start justify-between">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <Sparkles className="h-5 w-5 text-accent" />
-              <h3 className="text-lg font-semibold">Insights de IA</h3>
-            </div>
-            <p className="text-muted-foreground mb-4">
-              Análise preditiva e recomendações baseadas nos dados climáticos.
-              Em breve você poderá gerar relatórios detalhados com inteligência artificial.
-            </p>
-            <div className="flex gap-2">
-              <Button disabled className="bg-accent/10 text-accent hover:bg-accent/20 border-accent/20">
-                Gerar Análise
-              </Button>
-            </div>
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-accent" />
+            <h3 className="text-lg font-semibold">Insights de IA</h3>
           </div>
+          <Button
+            onClick={() => refetchInsights()}
+            disabled={insightsLoading}
+            className="bg-accent/10 text-accent hover:bg-accent/20 border-accent/20"
+          >
+            {insightsLoading ? 'Gerando...' : 'Gerar Análise'}
+          </Button>
         </div>
+
+        {insightsError && (
+          <div className="mb-4 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+            <p className="text-sm text-destructive">
+              Erro ao carregar insights. Verifique se o backend está rodando.
+            </p>
+          </div>
+        )}
+
+        {!normalizedInsights && !insightsLoading && !insightsError && (
+          <p className="text-muted-foreground">
+            Análise preditiva e recomendações baseadas nos dados climáticos.
+            Clique em "Gerar Análise" para obter insights detalhados com inteligência artificial.
+          </p>
+        )}
+
+        {insightsLoading && (
+          <div className="flex items-center justify-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent"></div>
+          </div>
+        )}
+
+        {normalizedInsights && normalizedInsights.insights && normalizedInsights.insights.length > 0 && (
+          <div className="space-y-3">
+            {normalizedInsights.summary && (
+              <p className="text-sm text-muted-foreground mb-4">
+                {normalizedInsights.summary}
+              </p>
+            )}
+            {normalizedInsights.insights.map((insight, index) => (
+              <div
+                key={insight.id || index}
+                className="p-4 bg-card/50 border border-border/50 rounded-lg hover:border-accent/30 transition-colors"
+              >
+                <div className="flex items-start justify-between mb-2">
+                  <h4 className="font-medium text-sm">{insight.title}</h4>
+                  {insight.severity && (
+                    <span
+                      className={`text-xs px-2 py-1 rounded-full ${
+                        insight.severity === 'critical'
+                          ? 'bg-destructive/10 text-destructive'
+                          : insight.severity === 'warning'
+                          ? 'bg-warning/10 text-warning'
+                          : 'bg-primary/10 text-primary'
+                      }`}
+                    >
+                      {insight.severity === 'critical'
+                        ? 'Crítico'
+                        : insight.severity === 'warning'
+                        ? 'Aviso'
+                        : 'Info'}
+                    </span>
+                  )}
+                </div>
+                <p className="text-sm text-muted-foreground mb-2">
+                  {insight.description}
+                </p>
+                {insight.recommendation && (
+                  <p className="text-sm text-accent">
+                    💡 {insight.recommendation}
+                  </p>
+                )}
+                {insight.confidence !== undefined && (
+                  <div className="mt-2 flex items-center gap-2">
+                    <span className="text-xs text-muted-foreground">
+                      Confiança:
+                    </span>
+                    <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden max-w-[100px]">
+                      <div
+                        className="h-full bg-accent"
+                        style={{ width: `${insight.confidence * 100}%` }}
+                      />
+                    </div>
+                    <span className="text-xs text-muted-foreground">
+                      {Math.round(insight.confidence * 100)}%
+                    </span>
+                  </div>
+                )}
+              </div>
+            ))}
+            {normalizedInsights.generatedAt && (
+              <p className="text-xs text-muted-foreground text-right mt-2">
+                Gerado em: {new Date(normalizedInsights.generatedAt).toLocaleString('pt-BR')}
+              </p>
+            )}
+          </div>
+        )}
+
+
+        {normalizedInsights && (!normalizedInsights.insights || normalizedInsights.insights.length === 0) && !insightsLoading && (
+          <div className="space-y-3">
+            {normalizedInsights.summary && (
+              <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg">
+                <p className="text-sm font-medium mb-1">📊 Resumo da Análise</p>
+                <p className="text-sm text-muted-foreground">
+                  {normalizedInsights.summary}
+                </p>
+              </div>
+            )}
+            {normalizedInsights.context && (
+              <p className="text-xs text-muted-foreground">
+                Análise baseada em {normalizedInsights.context.dataPointsAnalyzed} pontos de dados.
+              </p>
+            )}
+            {normalizedInsights.generatedAt && (
+              <p className="text-xs text-muted-foreground text-right">
+                Gerado em: {new Date(normalizedInsights.generatedAt).toLocaleString('pt-BR')}
+              </p>
+            )}
+            <p className="text-muted-foreground text-sm italic mt-2">
+              Nenhum insight específico foi gerado nesta análise.
+            </p>
+          </div>
+        )}
       </Card>
     </div>
   )
