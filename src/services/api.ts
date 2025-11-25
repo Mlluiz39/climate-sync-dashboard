@@ -1,44 +1,44 @@
 import axios from 'axios'
 
 export const api = axios.create({
-  baseURL: 'http://localhost:3000',
+  baseURL: 'http://localhost:3000/api',
   headers: {
     'Content-Type': 'application/json',
   },
 })
 
 // Interceptor para adicionar o token em todas as requisições
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
+api.interceptors.request.use(config => {
+  const token = localStorage.getItem('token')
   if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+    config.headers.Authorization = `Bearer ${token}`
   }
-  return config;
-});
+  return config
+})
 
 export interface LoginCredentials {
-  email: string;
-  password: string;
+  email: string
+  password: string
 }
 
 export interface RegisterData {
-  name: string;
-  email: string;
-  password: string;
+  name: string
+  email: string
+  password: string
 }
 
 export interface AuthResponse {
-  access_token: string;
+  access_token: string
   user?: {
-    id: string;
-    email: string;
-    name: string;
-  };
+    id: string
+    email: string
+    name: string
+  }
 }
 
 export interface WeatherData {
   windSpeed: number
-  id: string 
+  id: string
   timestamp: string
   temperature: number
   humidity: number
@@ -62,9 +62,9 @@ export interface AnalyticsData {
 
 // API Methods
 export const authApi = {
-  login: (credentials: LoginCredentials) => 
+  login: (credentials: LoginCredentials) =>
     api.post<AuthResponse>('/auth/login', credentials).then(res => res.data),
-  register: (data: RegisterData) => 
+  register: (data: RegisterData) =>
     api.post<AuthResponse>('/auth/register', data).then(res => res.data),
 }
 
@@ -75,3 +75,5 @@ export const weatherApi = {
   getAnalytics: () =>
     api.get<{ data: AnalyticsData }>('/analytics').then(res => res.data),
 }
+
+export const REALTIME_WEATHER_URL = `${api.defaults.baseURL}/weather/realtime`

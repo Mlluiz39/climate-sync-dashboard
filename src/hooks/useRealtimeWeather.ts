@@ -1,15 +1,13 @@
 // src/hooks/useRealtimeWeather.ts
 import { useState, useEffect } from 'react'
-import { WeatherData } from '@/services/api'
+import { REALTIME_WEATHER_URL, WeatherData } from '@/services/api'
 
 export const useRealtimeWeather = () => {
   const [latestData, setLatestData] = useState<WeatherData | null>(null)
   const [isConnected, setIsConnected] = useState(false)
 
   useEffect(() => {
-    const eventSource = new EventSource(
-      'http://localhost:3000/weather/realtime'
-    )
+    const eventSource = new EventSource(REALTIME_WEATHER_URL)
 
     eventSource.onopen = () => {
       setIsConnected(true)

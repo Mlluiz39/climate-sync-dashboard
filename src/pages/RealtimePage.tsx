@@ -26,7 +26,7 @@ const getWindSpeed = (data: any): number | null => {
 
   const possiblePaths = [
     data.wind_speed,
-    data.windSpeed, // Agora incluímos windSpeed
+    data.windSpeed, 
     data.data?.wind_speed,
     data.data?.windSpeed,
   ]
@@ -73,7 +73,6 @@ export default function RealtimePage() {
                 Temperatura
               </p>
               <p className="text-2xl font-bold">
-                {/* CORREÇÃO: Use safeToFixed em vez de .toFixed() diretamente */}
                 {safeToFixed(latestData?.temperature)}°C
               </p>
             </div>
@@ -91,7 +90,6 @@ export default function RealtimePage() {
                 Umidade
               </p>
               <p className="text-2xl font-bold">
-                {/* CORREÇÃO: Use safeToFixed em vez de .toFixed() diretamente */}
                 {safeToFixed(latestData?.humidity)}%
               </p>
             </div>
@@ -109,7 +107,6 @@ export default function RealtimePage() {
                 Velocidade do Vento
               </p>
               <p className="text-2xl font-bold">
-                {/* CORREÇÃO: Use getWindSpeed + safeToFixed */}
                 {safeToFixed(latestData?.windSpeed)} km/h
               </p>
             </div>

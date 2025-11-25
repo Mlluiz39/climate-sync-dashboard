@@ -69,7 +69,6 @@ export default function WeatherTable() {
     return value.toFixed(decimals)
   }
 
-  // Usa weatherHistory ao invés de weatherData diretamente
   const displayData =
     weatherHistory.length > 0 ? weatherHistory : weatherData || []
 
