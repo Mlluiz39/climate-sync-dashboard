@@ -87,20 +87,13 @@ export default function Dashboard() {
   const normalizedInsights = useMemo((): NormalizedInsightsResponse | null => {
     if (!aiInsights) return null
     
-    console.log('🔍 Raw aiInsights from backend:', aiInsights)
-    
     // Mapear estrutura do backend para estrutura do frontend
-    const normalized: NormalizedInsightsResponse = {
+    return {
       insights: aiInsights.data.details, // Backend usa 'details' ao invés de 'insights'
       generatedAt: aiInsights.data.generated_at,
       summary: aiInsights.data.summary,
       context: aiInsights.data.context
     }
-    
-    console.log('✅ Normalized insights:', normalized)
-    console.log('📊 Number of insights:', normalized.insights.length)
-    
-    return normalized
   }, [aiInsights])
 
   const { data: initialWeather } = useQuery<WeatherData[]>({
