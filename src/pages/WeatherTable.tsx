@@ -12,8 +12,10 @@ import {
 } from '@/components/ui/table'
 import { weatherApi, WeatherData } from '@/services/api'
 import { useRealtimeWeather } from '@/hooks/useRealtimeWeather'
-import { RefreshCw } from 'lucide-react'
+import { RefreshCw, Download, FileSpreadsheet } from 'lucide-react'
 import { toast } from 'sonner'
+import { saveAs } from 'file-saver'
+import * as XLSX from 'xlsx'
 
 export default function WeatherTable() {
   const [weatherHistory, setWeatherHistory] = useState<WeatherData[]>([])
@@ -72,6 +74,66 @@ export default function WeatherTable() {
   const displayData =
     weatherHistory.length > 0 ? weatherHistory : weatherData || []
 
+  const handleExportCSV = () => {
+    try {
+      if (displayData.length === 0) {
+        toast.error('Não há dados para exportar.')
+        return
+      }
+
+      const headers = ['Data e Hora', 'Cidade', 'Temperatura (°C)', 'Umidade (%)', 'Velocidade do Vento (km/h)']
+      const csvContent = [
+        headers.join(','),
+        ...displayData.map(item => {
+          const date = item.timestamp ? new Date(item.timestamp).toLocaleString() : 'N/A'
+          return [
+            `"${date}"`,
+            `"${item.city || 'N/A'}"`,
+            safeToFixed(item.temperature),
+            safeToFixed(item.humidity),
+            safeToFixed(item.windSpeed)
+          ].join(',')
+        })
+      ].join('\n')
+
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+      saveAs(blob, 'dados_climaticos.csv')
+      toast.success('Exportação CSV concluída!')
+    } catch (error) {
+      console.error('Erro ao exportar CSV:', error)
+      toast.error('Erro ao exportar CSV.')
+    }
+  }
+
+  const handleExportExcel = () => {
+    try {
+      if (displayData.length === 0) {
+        toast.error('Não há dados para exportar.')
+        return
+      }
+
+      const dataToExport = displayData.map(item => ({
+        'Data e Hora': item.timestamp ? new Date(item.timestamp).toLocaleString() : 'N/A',
+        'Cidade': item.city || 'N/A',
+        'Temperatura (°C)': Number(safeToFixed(item.temperature)),
+        'Umidade (%)': Number(safeToFixed(item.humidity)),
+        'Velocidade do Vento (km/h)': Number(safeToFixed(item.windSpeed))
+      }))
+
+      const worksheet = XLSX.utils.json_to_sheet(dataToExport)
+      const workbook = XLSX.utils.book_new()
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Dados Climáticos')
+      
+      const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' })
+      const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+      saveAs(blob, 'dados_climaticos.xlsx')
+      toast.success('Exportação Excel concluída!')
+    } catch (error) {
+      console.error('Erro ao exportar Excel:', error)
+      toast.error('Erro ao exportar Excel.')
+    }
+  }
+
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="flex items-center justify-between">
@@ -95,10 +157,20 @@ export default function WeatherTable() {
       <Card className="shadow-card">
         <div className="p-6 border-b border-border flex items-center justify-between">
           <h3 className="text-lg font-semibold">Registros</h3>
-          <Button variant="outline" size="sm" onClick={() => refetch()}>
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Atualizar
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={handleExportCSV}>
+              <FileSpreadsheet className="h-4 w-4 mr-2" />
+              CSV
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleExportExcel}>
+              <Download className="h-4 w-4 mr-2" />
+              Excel
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => refetch()}>
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Atualizar
+            </Button>
+          </div>
         </div>
         <div className="overflow-x-auto">
           {isLoading ? (

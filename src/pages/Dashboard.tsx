@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { Thermometer, Droplets, Wind, Database } from 'lucide-react'
+import { Thermometer, Droplets, Wind, Database, Sparkles } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { MetricCard } from '@/components/MetricCard'
 import { Card } from '@/components/ui/card'
 import { weatherApi, WeatherData } from '@/services/api'
@@ -161,10 +162,35 @@ export default function Dashboard() {
         }))
       : [{ time: '00:00', humidity: 0 }]
 
-  const temperatureRanges =
-    analytics?.temperatureRanges?.length > 0
-      ? analytics.temperatureRanges
-      : [{ range: '0-0', count: 0 }]
+  // Fallback calculation for temperature distribution
+  const calculatedTemperatureRanges = useMemo(() => {
+    if (analytics?.temperatureRanges?.length > 0) {
+      return analytics.temperatureRanges
+    }
+
+    if (!weatherHistory || weatherHistory.length === 0) {
+      return [{ range: '0-0', count: 0 }]
+    }
+
+    const ranges = {
+      '< 10°C': 0,
+      '10-20°C': 0,
+      '20-30°C': 0,
+      '> 30°C': 0,
+    }
+
+    weatherHistory.forEach(item => {
+      const temp = item.temperature
+      if (temp < 10) ranges['< 10°C']++
+      else if (temp >= 10 && temp < 20) ranges['10-20°C']++
+      else if (temp >= 20 && temp < 30) ranges['20-30°C']++
+      else ranges['> 30°C']++
+    })
+
+    return Object.entries(ranges).map(([range, count]) => ({ range, count }))
+  }, [analytics, weatherHistory])
+
+  const temperatureRanges = calculatedTemperatureRanges
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -200,7 +226,6 @@ export default function Dashboard() {
           subtitle="°C"
           icon={Thermometer}
           gradient="warning"
-withBackground
         />
         <MetricCard
           title="Umidade Média"
@@ -208,7 +233,6 @@ withBackground
           subtitle="%"
           icon={Droplets}
           gradient="primary"
-withBackground
         />
         <MetricCard
           title="Velocidade Média do Vento"
@@ -216,14 +240,12 @@ withBackground
           subtitle="km/h"
           icon={Wind}
           gradient="accent"
-withBackground
         />
         <MetricCard
           title="Total de Registros"
           value={formatMetricValue(displayMetrics?.totalRecords, true)}
           icon={Database}
           gradient="primary"
-withBackground
         />
       </div>
 
@@ -312,6 +334,46 @@ withBackground
             />
           </BarChart>
         </ResponsiveContainer>
+      </Card>
+
+      <Card className="p-6 shadow-card bg-gradient-to-br from-card to-accent/5 border-accent/20">
+        <div className="flex items-start justify-between">
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <Sparkles className="h-5 w-5 text-accent" />
+              <h3 className="text-lg font-semibold">Insights de IA</h3>
+            </div>
+            <p className="text-muted-foreground mb-4">
+              Análise preditiva e recomendações baseadas nos dados climáticos.
+              Em breve você poderá gerar relatórios detalhados com inteligência artificial.
+            </p>
+            <div className="flex gap-2">
+              <Button disabled className="bg-accent/10 text-accent hover:bg-accent/20 border-accent/20">
+                Gerar Análise
+              </Button>
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      <Card className="p-6 shadow-card bg-gradient-to-br from-card to-accent/5 border-accent/20">
+        <div className="flex items-start justify-between">
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <Sparkles className="h-5 w-5 text-accent" />
+              <h3 className="text-lg font-semibold">Insights de IA</h3>
+            </div>
+            <p className="text-muted-foreground mb-4">
+              Análise preditiva e recomendações baseadas nos dados climáticos.
+              Em breve você poderá gerar relatórios detalhados com inteligência artificial.
+            </p>
+            <div className="flex gap-2">
+              <Button disabled className="bg-accent/10 text-accent hover:bg-accent/20 border-accent/20">
+                Gerar Análise
+              </Button>
+            </div>
+          </div>
+        </div>
       </Card>
     </div>
   )
