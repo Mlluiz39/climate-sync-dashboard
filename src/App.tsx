@@ -6,11 +6,16 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { AppSidebar } from '@/components/AppSidebar'
 import Login from './pages/Login'
-import Register from './pages/Register'
+
 import Dashboard from './pages/Dashboard'
 import WeatherTable from './pages/WeatherTable'
 import RealtimePage from './pages/RealtimePage'
+import UserManagement from './pages/UserManagement'
+import About from './pages/About'
+import Architecture from './pages/Architecture'
+import RickAndMortyReference from './pages/RickAndMortyReference'
 import NotFound from './pages/NotFound'
+
 import { ProtectedRoute } from './components/ProtectedRoute'
 
 const queryClient = new QueryClient()
@@ -40,10 +45,7 @@ const router = createBrowserRouter(
       path: '/',
       element: <Login />,
     },
-    {
-      path: '/register',
-      element: <Register />,
-    },
+
     {
       path: '/dashboard',
       element: (
@@ -70,6 +72,66 @@ const router = createBrowserRouter(
         <ProtectedRoute>
           <Layout>
             <RealtimePage />
+          </Layout>
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: '/users',
+      element: (
+        <ProtectedRoute>
+          <Layout>
+            <UserManagement />
+          </Layout>
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: '/about',
+      element: (
+        <ProtectedRoute>
+          <Layout>
+            <About />
+          </Layout>
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: '/architecture',
+      element: (
+        <ProtectedRoute>
+          <Layout>
+            <Architecture />
+          </Layout>
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: '/about',
+      element: (
+        <ProtectedRoute>
+          <Layout>
+            <About />
+          </Layout>
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: '/architecture',
+      element: (
+        <ProtectedRoute>
+          <Layout>
+            <Architecture />
+          </Layout>
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: '/rick-and-morty',
+      element: (
+        <ProtectedRoute>
+          <Layout>
+            <RickAndMortyReference />
           </Layout>
         </ProtectedRoute>
       ),
