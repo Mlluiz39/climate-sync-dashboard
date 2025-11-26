@@ -1,37 +1,98 @@
 // src/hooks/useRealtimeWeather.ts
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { REALTIME_WEATHER_URL, WeatherData } from '@/services/api'
 
 export const useRealtimeWeather = () => {
   const [latestData, setLatestData] = useState<WeatherData | null>(null)
   const [isConnected, setIsConnected] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const eventSourceRef = useRef<EventSource | null>(null)
+  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
-    const eventSource = new EventSource(REALTIME_WEATHER_URL)
-
-    eventSource.onopen = () => {
-      setIsConnected(true)
+    const token = localStorage.getItem('token')
+    
+    // Não conecta se não houver token
+    if (!token) {
+      console.warn('⚠️ Token não encontrado. Conexão SSE não estabelecida.')
+      setIsConnected(false)
+      setError('Token não encontrado')
+      return
     }
 
-    eventSource.onmessage = event => {
+    const connectSSE = () => {
       try {
-        const data = JSON.parse(event.data)
+        // Adiciona o token como query parameter
 
-        setLatestData(data)
+        const urlWithToken = `${REALTIME_WEATHER_URL}?token=${encodeURIComponent(token)}`
+        
+        const eventSource = new EventSource(urlWithToken)
+        eventSourceRef.current = eventSource
+
+        eventSource.onopen = () => {
+          setIsConnected(true)
+          setError(null)
+        }
+
+        eventSource.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data)
+            setLatestData(data)
+          } catch (parseError) {
+            console.error('❌ Erro ao analisar dados SSE:', parseError)
+            setError('Erro ao processar dados')
+          }
+        }
+
+        eventSource.onerror = (event) => {
+          console.error('❌ Erro na conexão SSE:', event)
+          setIsConnected(false)
+          
+          // Verifica o estado da conexão
+          if (eventSource.readyState === EventSource.CLOSED) {
+            console.warn('⚠️ Conexão SSE fechada')
+            setError('Conexão fechada. Verifique sua autenticação.')
+            
+            // Limpa a conexão antiga
+            eventSource.close()
+            
+            // Tenta reconectar após 5 segundos
+            reconnectTimeoutRef.current = setTimeout(() => {
+              console.log('🔄 Tentando reconectar...')
+              connectSSE()
+            }, 5000)
+          } else if (eventSource.readyState === EventSource.CONNECTING) {
+            console.log('🔄 Conectando...')
+            setError('Conectando...')
+          }
+        }
       } catch (error) {
-        console.error('Erro ao analisar dados SSE:', error)
+        console.error('❌ Erro ao criar EventSource:', error)
+        setIsConnected(false)
+        setError(error instanceof Error ? error.message : 'Erro desconhecido')
       }
     }
 
-    eventSource.onerror = error => {
-      console.error('❌ Erro na conexão SSE:', error)
-      setIsConnected(false)
-    }
-
+    // Inicia a primeira conexão
+    connectSSE()
+   
     return () => {
-      eventSource.close()
+     
+      
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current)
+      }
+      
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close()
+        eventSourceRef.current = null
+      }
     }
-  }, [])
+  }, []) 
 
-  return { latestData, isConnected }
+  return { 
+    latestData, 
+    isConnected,
+    error 
+  }
 }
