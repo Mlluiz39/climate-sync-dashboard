@@ -135,10 +135,10 @@ export default function WeatherTable() {
   }
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4 md:space-y-6 animate-fade-in">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
             Dados Climáticos
           </h1>
         </div>
@@ -155,24 +155,77 @@ export default function WeatherTable() {
       </div>
 
       <Card className="shadow-card">
-        <div className="p-6 border-b border-border flex items-center justify-between">
-          <h3 className="text-lg font-semibold">Registros</h3>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={handleExportCSV}>
+        <div className="p-4 md:p-6 border-b border-border flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <h3 className="text-base md:text-lg font-semibold">Registros</h3>
+          <div className="flex flex-wrap gap-2">
+            <Button variant="outline" size="sm" onClick={handleExportCSV} className="flex-1 sm:flex-none">
               <FileSpreadsheet className="h-4 w-4 mr-2" />
               CSV
             </Button>
-            <Button variant="outline" size="sm" onClick={handleExportExcel}>
+            <Button variant="outline" size="sm" onClick={handleExportExcel} className="flex-1 sm:flex-none">
               <Download className="h-4 w-4 mr-2" />
               Excel
             </Button>
-            <Button variant="outline" size="sm" onClick={() => refetch()}>
+            <Button variant="outline" size="sm" onClick={() => refetch()} className="flex-1 sm:flex-none">
               <RefreshCw className="h-4 w-4 mr-2" />
               Atualizar
             </Button>
           </div>
         </div>
-        <div className="overflow-x-auto">
+        {/* Mobile view - Cards */}
+        <div className="block md:hidden">
+          {isLoading ? (
+            <div className="flex items-center justify-center p-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+          ) : displayData.length > 0 ? (
+            <div className="divide-y divide-border">
+              {displayData.map((record: WeatherData) => (
+                <div key={record.id} className="p-4 space-y-3">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <p className="font-medium text-sm">
+                        {record.timestamp
+                          ? new Date(record.timestamp).toLocaleString('pt-BR', {
+                              day: '2-digit',
+                              month: '2-digit',
+                              year: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })
+                          : 'N/A'}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {record.city || 'N/A'}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="space-y-1">
+                      <p className="text-xs text-muted-foreground">Temperatura</p>
+                      <p className="text-sm font-medium">{safeToFixed(record.temperature)}°C</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-xs text-muted-foreground">Umidade</p>
+                      <p className="text-sm font-medium">{safeToFixed(record.humidity)}%</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-xs text-muted-foreground">Vento</p>
+                      <p className="text-sm font-medium">{safeToFixed(record.windSpeed)} km/h</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-muted-foreground">
+              Nenhum dado encontrado
+            </div>
+          )}
+        </div>
+
+        {/* Desktop view - Table */}
+        <div className="hidden md:block overflow-x-auto">
           {isLoading ? (
             <div className="flex items-center justify-center p-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -181,11 +234,11 @@ export default function WeatherTable() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Data e Hora</TableHead>
-                  <TableHead>Cidade</TableHead>
-                  <TableHead className="text-right">Temperatura (°C)</TableHead>
-                  <TableHead className="text-right">Umidade (%)</TableHead>
-                  <TableHead className="text-right">
+                  <TableHead className="whitespace-nowrap">Data e Hora</TableHead>
+                  <TableHead className="whitespace-nowrap">Cidade</TableHead>
+                  <TableHead className="text-right whitespace-nowrap">Temperatura (°C)</TableHead>
+                  <TableHead className="text-right whitespace-nowrap">Umidade (%)</TableHead>
+                  <TableHead className="text-right whitespace-nowrap">
                     Velocidade do Vento (km/h)
                   </TableHead>
                 </TableRow>

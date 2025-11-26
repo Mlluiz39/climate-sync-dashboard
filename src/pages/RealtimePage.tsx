@@ -44,11 +44,11 @@ export default function RealtimePage() {
   const { latestData, isConnected } = useRealtimeWeather()
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4 md:space-y-6 animate-fade-in">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Tempo Real</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Tempo Real</h1>
+          <p className="text-muted-foreground mt-1 text-sm sm:text-base">
             Monitoramento climático em tempo real
           </p>
         </div>
@@ -66,52 +66,52 @@ export default function RealtimePage() {
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {/* Temperatura */}
-        <Card className="p-6 shadow-card">
+        <Card className="p-4 md:p-6 shadow-card">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-muted-foreground">
                 Temperatura
               </p>
-              <p className="text-2xl font-bold">
+              <p className="text-xl sm:text-2xl font-bold">
                 {safeToFixed(latestData?.temperature)}°C
               </p>
             </div>
-            <div className="p-3 bg-orange-100 rounded-full">
-              <Thermometer className="h-6 w-6 text-orange-600" />
+            <div className="p-2 sm:p-3 bg-orange-100 rounded-full">
+              <Thermometer className="h-5 w-5 sm:h-6 sm:w-6 text-orange-600" />
             </div>
           </div>
         </Card>
 
         {/* Umidade */}
-        <Card className="p-6 shadow-card">
+        <Card className="p-4 md:p-6 shadow-card">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-muted-foreground">
                 Umidade
               </p>
-              <p className="text-2xl font-bold">
+              <p className="text-xl sm:text-2xl font-bold">
                 {safeToFixed(latestData?.humidity)}%
               </p>
             </div>
-            <div className="p-3 bg-blue-100 rounded-full">
-              <Droplets className="h-6 w-6 text-blue-600" />
+            <div className="p-2 sm:p-3 bg-blue-100 rounded-full">
+              <Droplets className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" />
             </div>
           </div>
         </Card>
 
         {/* Velocidade do Vento */}
-        <Card className="p-6 shadow-card">
+        <Card className="p-4 md:p-6 shadow-card">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-muted-foreground">
                 Velocidade do Vento
               </p>
-              <p className="text-2xl font-bold">
+              <p className="text-xl sm:text-2xl font-bold">
                 {safeToFixed(latestData?.windSpeed)} km/h
               </p>
             </div>
-            <div className="p-3 bg-green-100 rounded-full">
-              <Wind className="h-6 w-6 text-green-600" />
+            <div className="p-2 sm:p-3 bg-green-100 rounded-full">
+              <Wind className="h-5 w-5 sm:h-6 sm:w-6 text-green-600" />
             </div>
           </div>
         </Card>
@@ -119,10 +119,10 @@ export default function RealtimePage() {
 
       {/* Informações adicionais */}
       <div className="grid gap-4 md:grid-cols-2">
-        <Card className="p-6 shadow-card">
+        <Card className="p-4 md:p-6 shadow-card">
           <div className="flex items-center gap-2 mb-4">
-            <MapPin className="h-5 w-5 text-primary" />
-            <h3 className="text-lg font-semibold">Localização</h3>
+            <MapPin className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+            <h3 className="text-base md:text-lg font-semibold">Localização</h3>
           </div>
           <p className="text-muted-foreground">
             {latestData?.city || 'São Paulo'}
@@ -132,14 +132,14 @@ export default function RealtimePage() {
           </p>
         </Card>
 
-        <Card className="p-6 shadow-card">
+        <Card className="p-4 md:p-6 shadow-card">
           <div className="flex items-center gap-2 mb-4">
             <div
               className={`h-3 w-3 rounded-full ${
                 isConnected ? 'bg-green-500' : 'bg-red-500'
               }`}
             ></div>
-            <h3 className="text-lg font-semibold">Status da Conexão</h3>
+            <h3 className="text-base md:text-lg font-semibold">Status da Conexão</h3>
           </div>
           <p className={isConnected ? 'text-green-600' : 'text-red-600'}>
             {isConnected ? '🟢 Conectado e recebendo dados' : '🔴 Desconectado'}

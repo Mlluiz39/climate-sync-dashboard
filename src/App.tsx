@@ -11,6 +11,7 @@ import Dashboard from './pages/Dashboard'
 import WeatherTable from './pages/WeatherTable'
 import RealtimePage from './pages/RealtimePage'
 import NotFound from './pages/NotFound'
+import { ProtectedRoute } from './components/ProtectedRoute'
 
 const queryClient = new QueryClient()
 
@@ -23,7 +24,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => (
         <header className="h-14 border-b border-border flex items-center px-4 sticky top-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-10">
           <SidebarTrigger />
         </header>
-        <main className="flex-1 p-6 overflow-auto">{children}</main>
+        <main className="flex-1 p-4 md:p-6 overflow-auto">{children}</main>
         <footer className="border-t border-border p-4 text-center text-sm text-muted-foreground">
           Climate Sync © 2025 — Desenvolvido com React + NestJS
         </footer>
@@ -46,33 +47,41 @@ const router = createBrowserRouter(
     {
       path: '/dashboard',
       element: (
-        <Layout>
-          <Dashboard />
-        </Layout>
+        <ProtectedRoute>
+          <Layout>
+            <Dashboard />
+          </Layout>
+        </ProtectedRoute>
       ),
     },
     {
       path: '/weather',
       element: (
-        <Layout>
-          <WeatherTable />
-        </Layout>
+        <ProtectedRoute>
+          <Layout>
+            <WeatherTable />
+          </Layout>
+        </ProtectedRoute>
       ),
     },
     {
       path: '/realtime',
       element: (
-        <Layout>
-          <RealtimePage />
-        </Layout>
+        <ProtectedRoute>
+          <Layout>
+            <RealtimePage />
+          </Layout>
+        </ProtectedRoute>
       ),
     },
     {
       path: '*',
       element: (
-        <Layout>
-          <NotFound />
-        </Layout>
+        <ProtectedRoute>
+          <Layout>
+            <NotFound />
+          </Layout>
+        </ProtectedRoute>
       ),
     },
   ],

@@ -16,6 +16,26 @@ api.interceptors.request.use(config => {
   return config
 })
 
+// Interceptor para tratar erros de autenticação
+api.interceptors.response.use(
+  response => response,
+  error => {
+    if (error.response?.status === 401) {
+      // Token inválido ou expirado
+      localStorage.removeItem('token')
+      localStorage.removeItem('user')
+      
+      // Redireciona para login apenas se não estiver já na página de login/register
+      if (!window.location.pathname.includes('/login') && 
+          !window.location.pathname.includes('/register') &&
+          window.location.pathname !== '/') {
+        window.location.href = '/'
+      }
+    }
+    return Promise.reject(error)
+  }
+)
+
 export interface LoginCredentials {
   email: string
   password: string
@@ -61,14 +81,9 @@ export interface AnalyticsData {
 }
 
 export interface AIInsight {
-  id?: string
   type: string
-  title: string
-  description: string
-  recommendation?: string
-  confidence?: number
-  timestamp?: string
-  severity?: 'info' | 'warning' | 'critical'
+  category: string
+  message: string
 }
 
 // Estrutura real retornada pelo backend
