@@ -125,6 +125,12 @@ export const weatherApi = {
     api.get<{ data: AnalyticsData }>('/analytics').then(res => res.data),
   getInsights: () =>
     api.get<BackendInsightsResponse>('/weather/insights').then(res => res.data),
+  getWeatherByLocation: (latitude: number, longitude: number, radius: number = 50) =>
+    api
+      .get<WeatherData[]>(
+        `/weather/by-location?latitude=${latitude}&longitude=${longitude}&radius=${radius}`
+      )
+      .then(res => res.data),
 }
 
 export interface User {

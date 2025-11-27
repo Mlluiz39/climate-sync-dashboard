@@ -6,6 +6,8 @@ import { MetricCard } from '@/components/MetricCard'
 import { Card } from '@/components/ui/card'
 import { weatherApi, WeatherData, BackendInsightsResponse, NormalizedInsightsResponse } from '@/services/api'
 import { useRealtimeWeather } from '@/hooks/useRealtimeWeather'
+import { useGeolocation } from '@/hooks/useGeolocation'
+import { MapPin } from 'lucide-react'
 import {
   LineChart,
   Line,
@@ -48,6 +50,21 @@ const formatMetricValue = (
 export default function Dashboard() {
   const [weatherHistory, setWeatherHistory] = useState<WeatherData[]>([])
   const { latestData, isConnected } = useRealtimeWeather()
+  const { latitude, longitude, error: geoError, loading: geoLoading } = useGeolocation()
+
+  const { data: nearbyWeather, isLoading: nearbyLoading } = useQuery<WeatherData[]>({
+    queryKey: ['nearbyWeather', latitude, longitude],
+    queryFn: async () => {
+      if (latitude && longitude) {
+        console.log('📡 Buscando clima próximo para:', { latitude, longitude, radius: 50 })
+        const result = await weatherApi.getWeatherByLocation(latitude, longitude)
+        console.log('✅ Cidades encontradas:', result.map(w => w.city))
+        return result
+      }
+      return []
+    },
+    enabled: !!latitude && !!longitude,
+  })
 
   const {
     data: metrics,
@@ -362,6 +379,89 @@ export default function Dashboard() {
             />
           </BarChart>
         </ResponsiveContainer>
+      </Card>
+
+      <Card className="p-4 md:p-6 shadow-card">
+        <div className="flex items-center gap-2 mb-4">
+          <MapPin className="h-5 w-5 text-primary" />
+          <h3 className="text-base md:text-lg font-semibold">
+            Clima nas Proximidades
+          </h3>
+        </div>
+
+        {latitude && longitude && (
+          <div className="mb-4 p-3 bg-primary/5 border border-primary/20 rounded-lg">
+            <p className="text-xs text-muted-foreground mb-1">Sua localização detectada:</p>
+            <div className="flex flex-wrap gap-4 text-sm">
+              <div className="flex items-center gap-1">
+                <span className="font-medium">Latitude:</span>
+                <code className="px-2 py-0.5 bg-muted rounded text-xs">{latitude.toFixed(6)}</code>
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="font-medium">Longitude:</span>
+                <code className="px-2 py-0.5 bg-muted rounded text-xs">{longitude.toFixed(6)}</code>
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="font-medium">Raio:</span>
+                <code className="px-2 py-0.5 bg-muted rounded text-xs">50 km</code>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {geoLoading ? (
+          <p className="text-muted-foreground text-sm">Obtendo sua localização...</p>
+        ) : geoError ? (
+          <p className="text-destructive text-sm">
+            Não foi possível obter sua localização para mostrar dados próximos.
+          </p>
+        ) : nearbyLoading ? (
+          <div className="flex items-center justify-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
+        ) : nearbyWeather && nearbyWeather.length > 0 ? (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-left">
+              <thead className="text-muted-foreground border-b border-border">
+                <tr>
+                  <th className="py-2 font-medium">Cidade</th>
+                  <th className="py-2 font-medium">Temp</th>
+                  <th className="py-2 font-medium">Umidade</th>
+                  <th className="py-2 font-medium">Vento</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border/50">
+                {nearbyWeather.map((item, index) => (
+                  <tr key={index} className="group hover:bg-muted/50 transition-colors">
+                    <td className="py-3 font-medium">{item.city}</td>
+                    <td className="py-3">
+                      <div className="flex items-center gap-1">
+                        <Thermometer className="h-3 w-3 text-warning" />
+                        {item.temperature.toFixed(1)}°C
+                      </div>
+                    </td>
+                    <td className="py-3">
+                      <div className="flex items-center gap-1">
+                        <Droplets className="h-3 w-3 text-primary" />
+                        {item.humidity}%
+                      </div>
+                    </td>
+                    <td className="py-3">
+                      <div className="flex items-center gap-1">
+                        <Wind className="h-3 w-3 text-accent" />
+                        {item.windSpeed} km/h
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p className="text-muted-foreground text-sm">
+            Nenhuma estação meteorológica encontrada num raio de 50km.
+          </p>
+        )}
       </Card>
 
 
