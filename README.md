@@ -83,9 +83,9 @@ src
 └─ assets
    └─ Imagens, ícones e arquivos estáticos
 
----
-
 ```
+
+---
 
 ## 🔧 Como Executar o Projeto
 
