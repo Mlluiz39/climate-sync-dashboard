@@ -66,14 +66,23 @@ O foco do projeto é demonstrar **boas práticas de frontend**, organização de
 
 ## 📁 Estrutura do Projeto
 
-src/
-├── components/   # Componentes reutilizáveis
-├── pages/        # Páginas principais do dashboard
-├── hooks/        # Hooks personalizados
-├── context/      # Contexto e estado global
-├── services/     # Comunicação com APIs
-├── utils/        # Funções utilitárias
-└── assets/       # Imagens, ícones e arquivos estáticos
+src
+├─ components
+│  └─ Componentes reutilizáveis da aplicação
+├─ pages
+│  └─ Páginas principais do dashboard
+├─ hooks
+│  └─ Hooks personalizados
+├─ context
+│  └─ Contexto e gerenciamento de estado global
+├─ services
+│  └─ Comunicação com APIs e integrações
+├─ utils
+│  └─ Funções utilitárias e helpers
+└─ assets
+   └─ Imagens, ícones e arquivos estáticos
+   
+---
 
 ## 🔧 Como Executar o Projeto
 
