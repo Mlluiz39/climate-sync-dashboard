@@ -1,128 +1,122 @@
-Climate Dashboard – Frontend
-🌍 Visão Geral
+# 🌍 Climate Dashboard – Frontend
 
-Este projeto é um frontend profissional desenvolvido como parte de um teste técnico.
-Ele consiste em um Painel de Monitoramento Climático que apresenta dados meteorológicos em tempo real, gráficos interativos e visualizações modernas, utilizando tecnologias atuais e uma arquitetura limpa e escalável.
+![React](https://img.shields.io/badge/React-18.x-61DAFB?logo=react)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript)
+![Vite](https://img.shields.io/badge/Vite-⚡-646CFF?logo=vite)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?logo=tailwind-css)
+![License](https://img.shields.io/badge/license-Teste_Técnico-blue)
 
-O objetivo é demonstrar:
+---
 
-domínio de React e TypeScript
+## 📖 Visão Geral
 
-organização e arquitetura de frontend
+O **Climate Dashboard** é um frontend profissional desenvolvido como parte de um **teste técnico**.
+O projeto consiste em um **Painel de Monitoramento Climático**, responsável por exibir dados meteorológicos em tempo real, gráficos interativos e visualizações modernas, utilizando tecnologias atuais e uma arquitetura limpa e escalável.
 
-consumo e tratamento de APIs climáticas
+O foco do projeto é demonstrar **boas práticas de frontend**, organização de código e experiência do usuário.
 
-componentização e boas práticas
+---
 
-construção de interfaces modernas, responsivas e intuitivas
+## 🎯 Objetivos
 
-🚀 Tecnologias Utilizadas
+- Domínio de **React** e **TypeScript**
+- Arquitetura de frontend limpa e escalável
+- Consumo e tratamento de **APIs climáticas**
+- Componentização e reutilização de código
+- Interfaces modernas, responsivas e intuitivas
+- Visualização de dados com gráficos interativos
 
-Vite – Ambiente moderno de build e desenvolvimento
+---
 
-React + TypeScript – Base do frontend
+## 🚀 Tecnologias Utilizadas
 
-Tailwind CSS – Estilização rápida, organizada e responsiva
+- **Vite** — Ambiente moderno de build e desenvolvimento
+- **React + TypeScript** — Base do frontend
+- **Tailwind CSS** — Estilização rápida e responsiva
+- **shadcn/ui** — Componentes acessíveis e sofisticados
+- **Recharts** — Gráficos para visualização de dados
+- **Axios / Fetch API** — Comunicação com APIs externas
+- **ESLint + Prettier** — Padronização e qualidade do código
 
-shadcn/ui – Componentes acessíveis e sofisticados
+---
 
-Recharts – Biblioteca de gráficos para dados meteorológicos
+## 🌦️ Funcionalidades
 
-Axios / Fetch API – Comunicação com a API
+### 📊 Dados Climáticos
+- Temperatura atual
+- Umidade relativa
+- Sensação térmica
+- Velocidade e direção do vento
+- Condição climática
 
-ESLint + Prettier – Padronização e qualidade do código
+### 📈 Gráficos Interativos
+- Variação de temperatura por hora
+- Histórico diário
+- Tendências meteorológicas
 
-🌦️ Funcionalidades do Dashboard
-✔ Dados Climáticos Principais
+### 🔄 Atualização em Tempo Real
+- Integração com APIs climáticas externas
 
-Temperatura atual
+### 🎨 Interface Responsiva
+- Layout adaptável para desktop, tablet e mobile
+- Design moderno e profissional
+- Componentes reutilizáveis
 
-Umidade relativa
+---
 
-Sensação térmica
+## 📁 Estrutura do Projeto
 
-Velocidade e direção dos ventos
-
-Condição do clima (limpo, nublado, chuva, etc.)
-
-✔ Gráficos Interativos
-
-Variação de temperatura por hora
-
-Histórico diário
-
-Tendências meteorológicas
-
-✔ Atualização em Tempo Real
-
-Comunicação com API externa (OpenWeather, Open-Meteo ou API própria do teste)
-
-✔ Interface Moderna e Responsiva
-
-Design profissional adaptável para desktop, tablet e mobile
-
-Componentes reutilizáveis e consistentes
-
-📁 Estrutura do Projeto
 src/
-├── components/ # Componentes reutilizáveis
-├── pages/ # Telas principais do dashboard
-├── hooks/ # Hooks personalizados
-├── context/ # Estado global e providers
-├── services/ # Comunicação com API e integrações
-├── utils/ # Funções auxiliares e helpers
-└── assets/ # Ícones, estilos e imagens
+├── components/
+├── pages/
+├── hooks/
+├── context/
+├── services/
+├── utils/
+└── assets/
 
-🔧 Como Executar o Projeto
+---
 
-1. Instale as dependências
-   npm install
+## 🔧 Como Executar o Projeto
 
-2. Execute o servidor de desenvolvimento
-   npm run dev
+### Instalar dependências
 
-3. Acesse no navegador
-   http://localhost:8080
+npm install
 
-🧪 Sobre o Teste Técnico
+### Executar ambiente de desenvolvimento
 
-Este projeto foi criado para demonstrar:
+npm run dev
 
-Capacidade de construir interfaces profissionais e responsivas
+### Acessar no navegador
 
-Boas práticas de organização e arquitetura
+http://localhost:8080
 
-Habilidade com bibliotecas modernas e componentes customizados
+---
 
-Visualização de dados usando gráficos
+## 🧪 Sobre o Teste Técnico
 
-Tratamento de dados em tempo real
+Este projeto demonstra capacidade de criar interfaces profissionais, organizar código frontend, utilizar bibliotecas modernas e visualizar dados em tempo real.
 
-📦 Build de Produção
+---
+
+## 📦 Build de Produção
+
 npm run build
 
-A versão final será gerada em:
+Os arquivos finais serão gerados na pasta **dist/**.
 
-dist/
+---
 
-E pode ser publicada em serviços como:
+## 📄 Licença
 
-Vercel
+Este projeto faz parte de um **teste técnico**.
+Pode ser utilizado como referência ou base para estudos.
 
-Netlify
+---
 
-GitHub Pages
+## ✨ Autor
 
-Cloudflare Pages
+Desenvolvido por **Marcelo Luiz**
 
-📄 Licença
-
-Este projeto faz parte de um teste técnico.
-Você pode utilizá-lo como referência ou base para novos projetos.
-
-✨ Autor
-
-Desenvolvido por [Seu Nome Aqui]
-🔗 LinkedIn: https://www.linkedin.com
-
-🔗 GitHub: https://github.com
+LinkedIn: https://www.linkedin.com/in/marcelo-luiz-pereira-souza/  
+GitHub: https://github.com/Mlluiz39
