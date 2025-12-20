@@ -66,16 +66,19 @@ O foco do projeto é demonstrar **boas práticas de frontend**, organização de
 
 ## 📁 Estrutura do Projeto
 
+```text
 src/
-├── components/
-├── pages/
-├── hooks/
-├── context/
-├── services/
-├── utils/
-└── assets/
+├── components/   # Componentes reutilizáveis
+├── pages/        # Páginas principais do dashboard
+├── hooks/        # Hooks personalizados
+├── context/      # Contexto e estado global
+├── services/     # Comunicação com APIs
+├── utils/        # Funções utilitárias
+└── assets/       # Imagens, ícones e arquivos estáticos
 
----
+```md
+> Estrutura organizada seguindo princípios de escalabilidade e separação de responsabilidades.
+
 
 ## 🔧 Como Executar o Projeto
 
@@ -93,7 +96,7 @@ http://localhost:8080
 
 ---
 
-## 🧪 Sobre o Teste Técnico
+## 🧪 Sobre o Projeto
 
 Este projeto demonstra capacidade de criar interfaces profissionais, organizar código frontend, utilizar bibliotecas modernas e visualizar dados em tempo real.
 
