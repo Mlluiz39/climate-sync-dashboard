@@ -76,9 +76,7 @@ src/
 ├── utils/        # Funções utilitárias
 └── assets/       # Imagens, ícones e arquivos estáticos
 
-```md
-> Estrutura organizada seguindo princípios de escalabilidade e separação de responsabilidades.
-
+---
 
 ## 🔧 Como Executar o Projeto
 
