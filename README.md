@@ -66,6 +66,7 @@ O foco do projeto é demonstrar **boas práticas de frontend**, organização de
 
 ## 📁 Estrutura do Projeto
 
+```
 src
 ├─ components
 │  └─ Componentes reutilizáveis da aplicação
@@ -81,8 +82,10 @@ src
 │  └─ Funções utilitárias e helpers
 └─ assets
    └─ Imagens, ícones e arquivos estáticos
-   
+
 ---
+
+```
 
 ## 🔧 Como Executar o Projeto
 
