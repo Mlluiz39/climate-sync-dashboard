@@ -117,6 +117,13 @@ Os arquivos finais serão gerados na pasta **dist/**.
 
 ---
 
+## Como acessar o projeto 
+
+Na página de login utilizar o login
+de test:
+email: admin@example.com
+Senha: 123456
+
 ## 📄 Licença
 
 Este projeto faz parte de um **teste técnico**.
