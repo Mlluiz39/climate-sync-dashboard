@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 export const api = axios.create({
-  baseURL: 'http://64.181.163.223:3000/api',
+  baseURL: 'http://localhost:3000/api',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -57,16 +57,21 @@ export interface AuthResponse {
 }
 
 export interface WeatherData {
-  windSpeed: number
-  id: string
-  timestamp: string
+  id?: string
+  timestamp?: string
   temperature: number
   humidity: number
+  windSpeed: number
   city: string
+  state?: string | null
+  country?: string | null
+  ip?: string | null
+  locationSource?: 'ip-geolocation' | 'fixed' | null
+  description?: string
 }
 
 export interface DashboardMetrics {
-  windSpeed(windSpeed: any): string | number
+  windSpeed(windSpeed: unknown): string | number
   avgTemperature: number
   avgHumidity: number
   avgWindSpeed: number
@@ -120,9 +125,9 @@ export const authApi = {
 export const weatherApi = {
   getAll: () => api.get<WeatherData[]>('/weather').then(res => res.data),
   getDashboard: () =>
-    api.get<{ data: DashboardMetrics }>('/dashboard').then(res => res.data),
+    api.get<{ data: DashboardMetrics }>('/weather/dashboard').then(res => res.data),
   getAnalytics: () =>
-    api.get<{ data: AnalyticsData }>('/analytics').then(res => res.data),
+    api.get<{ data: AnalyticsData }>('/weather/analytics').then(res => res.data),
   getInsights: () =>
     api.get<BackendInsightsResponse>('/weather/insights').then(res => res.data),
   getWeatherByLocation: (latitude: number, longitude: number, radius: number = 50) =>
@@ -131,6 +136,13 @@ export const weatherApi = {
         `/weather/by-location?latitude=${latitude}&longitude=${longitude}&radius=${radius}`
       )
       .then(res => res.data),
+  getLiveWeather: (latitude: number, longitude: number) =>
+    api
+      .get<WeatherData>(`/weather/live?latitude=${latitude}&longitude=${longitude}`)
+      .then(res => res.data),
+  getLiveWeatherByIp: () =>
+    api.get<WeatherData>('/weather/live-by-ip').then(res => res.data),
+  getRecent: () => api.get<WeatherData[]>('/weather/recent').then(res => res.data),
 }
 
 export interface User {

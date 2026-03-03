@@ -56,14 +56,24 @@ export default function Dashboard() {
     queryKey: ['nearbyWeather', latitude, longitude],
     queryFn: async () => {
       if (latitude && longitude) {
-        console.log('📡 Buscando clima próximo para:', { latitude, longitude, radius: 50 })
-        const result = await weatherApi.getWeatherByLocation(latitude, longitude)
-        console.log('✅ Cidades encontradas:', result.map(w => w.city))
-        return result
+        return await weatherApi.getWeatherByLocation(latitude, longitude)
       }
       return []
     },
     enabled: !!latitude && !!longitude,
+  })
+
+  // Novo: Busca clima exato para a posição do usuário (Live)
+  const { data: userLiveWeather, isLoading: userLiveLoading } = useQuery<WeatherData>({
+    queryKey: ['userLiveWeather', latitude, longitude],
+    queryFn: async () => {
+      if (latitude && longitude) {
+        return await weatherApi.getLiveWeather(latitude, longitude)
+      }
+      throw new Error('Localização não disponível')
+    },
+    enabled: !!latitude && !!longitude,
+    staleTime: 5 * 60 * 1000, // 5 minutos
   })
 
   const {
@@ -258,6 +268,54 @@ export default function Dashboard() {
         </div>
       </div>
 
+      {/* Seção de Clima do Usuário (Destaque) */}
+      {latitude && longitude && userLiveWeather && (
+        <Card className="p-4 md:p-6 shadow-card bg-gradient-to-br from-primary/10 to-accent/5 border-primary/20">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-primary/10 rounded-xl">
+                <MapPin className="h-8 w-8 text-primary" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold">Clima no seu Local Agora</h2>
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <span className="font-medium text-foreground">{userLiveWeather.city}</span>
+                  <span>•</span>
+                  <span>{userLiveWeather.state || userLiveWeather.country}</span>
+                  <span className="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded-full font-medium ml-2">
+                    Sua Localização
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-8 py-2 md:py-0">
+              <div className="flex items-center gap-3">
+                <Thermometer className="h-5 w-5 text-warning" />
+                <div>
+                  <p className="text-xs text-muted-foreground">Temperatura</p>
+                  <p className="text-xl font-bold">{formatMetricValue(userLiveWeather.temperature)}°C</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <Droplets className="h-5 w-5 text-primary" />
+                <div>
+                  <p className="text-xs text-muted-foreground">Umidade</p>
+                  <p className="text-xl font-bold">{formatMetricValue(userLiveWeather.humidity)}%</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <Wind className="h-5 w-5 text-accent" />
+                <div>
+                  <p className="text-xs text-muted-foreground">Vento</p>
+                  <p className="text-xl font-bold">{formatMetricValue(userLiveWeather.windSpeed)} km/h</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Card>
+      )}
+
       {metricsError && (
         <p className="text-destructive text-sm mb-2">
           Não foi possível carregar métricas do servidor. Mostrando valores padrão.
@@ -437,7 +495,7 @@ export default function Dashboard() {
                     <td className="py-3">
                       <div className="flex items-center gap-1">
                         <Thermometer className="h-3 w-3 text-warning" />
-                        {item.temperature.toFixed(1)}°C
+                        {formatMetricValue(item.temperature)}°C
                       </div>
                     </td>
                     <td className="py-3">
